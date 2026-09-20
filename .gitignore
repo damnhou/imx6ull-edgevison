@@ -1,0 +1,10 @@
+/build*/
+/third_party/ncnn/
+/models/*.bin
+/models/*.param
+/models/*.param.bin
+/models/synset_words.txt
+/results/
+*.log
+*.exe
+
