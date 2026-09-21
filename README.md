@@ -1,4 +1,4 @@
-# EdgeVision i.MX6ULL 本地图像推理
+# EdgeVision i.MX6ULL 本地NCNN边缘部署
 
 面向正点原子 ALPHA（NXP i.MX6ULL / Cortex-A7）的 NCNN 图像分类工程。第一阶段只处理
 本地 JPEG、PNG、BMP 文件，完成图像解码、预处理、CPU 推理、Top-K 输出与耗时统计；
