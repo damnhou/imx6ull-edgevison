@@ -32,6 +32,71 @@ ldd --version
 3. 使用 `readelf -A` 检查 hard-float、NEON 等属性；
 4. 使用 `readelf -d` 和板端 `ldd` 检查依赖。
 
+## 本项目已验证环境
+
+以下组合已在 ALPHA i.MX6ULL eMMC/512 MB 开发板上完成实际编译、部署和推理：
+
+| 项目 | 已验证配置 |
+|---|---|
+| 虚拟机 | Ubuntu 16.04.7 x86_64 |
+| SDK | FSL Yocto SDK `4.1.15-2.1.0` |
+| 交叉编译器 | GCC 5.3.0，`arm-poky-linux-gnueabi-` |
+| SDK 环境脚本 | `/opt/fsl-imx-x11/4.1.15-2.1.0/environment-setup-cortexa7hf-neon-poky-linux-gnueabi` |
+| CPU/ABI | ARMv7、Cortex-A7、NEON、hard-float |
+| 板端加载器 | `/lib/ld-linux-armhf.so.3` |
+| 板端部署目录 | `/opt/imx6ull-edgevision` |
+
+交叉编译命令：
+
+```bash
+source /opt/fsl-imx-x11/4.1.15-2.1.0/\
+environment-setup-cortexa7hf-neon-poky-linux-gnueabi
+
+export CROSS_COMPILE=arm-poky-linux-gnueabi-
+export IMX6ULL_SYSROOT="$SDKTARGETSYSROOT"
+
+cd ~/imx6ull-edgevision
+BUILD_JOBS=2 ./scripts/build_arm.sh
+```
+
+构建脚本兼容 BSP 虚拟机自带的 CMake 3.5。`THREADS_PTHREAD_ARG=2` 是老版
+`FindThreads.cmake` 交叉编译时需要的预置结果：测试程序能够链接，但 ARM 程序不能在
+x86 虚拟机上直接执行。
+
+产物检查结果应包含：
+
+```text
+ELF 32-bit LSB executable, ARM, EABI5
+interpreter /lib/ld-linux-armhf.so.3
+Flags: Version5 EABI, hard-float ABI
+```
+
+## 已验证板端运行
+
+```bash
+cd /opt/imx6ull-edgevision
+./edgevision_cli \
+  --param models/squeezenet_v1.1.param \
+  --bin models/squeezenet_v1.1.bin \
+  --labels models/synset_words.txt \
+  --image assets/cat.jpg \
+  --width 227 --height 227 --pixel bgr \
+  --mean 104,117,123 --norm 1,1,1 \
+  --input data --output prob \
+  --topk 5 --warmup 1 --repeat 1 --threads 1
+```
+
+2026-09-21 实测结果：
+
+| 图片 | Top-1 | 置信度 | 单线程推理时间 | 峰值 RSS |
+|---|---|---:|---:|---:|
+| `cat.jpg` | tabby cat | 0.273 | 654 ms | 36.5 MB |
+| `cat1.jpg` | guinea pig | 0.182 | 654 ms | 36.6 MB |
+| `cat2.jpg` | tabby cat | 0.199 | 648 ms | 30.4 MB |
+
+板端结果与 Windows 主机结果一致。`cat1.jpg` 的 Top-1 是错误分类，这是模型精度问题，
+不是 ARM 移植或数值计算错误。
+
 ## 常见错误
 
 ### 找不到动态加载器
@@ -61,4 +126,3 @@ ls -l /lib/ld-linux*
 
 优先检查 RGB/BGR、输入尺寸、缩放裁剪方法、均值、归一化系数及 blob 名称。不要先怀疑
 NEON 或 NCNN 推理核心。
-
