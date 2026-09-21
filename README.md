@@ -8,12 +8,13 @@
 
 - 已完成可参数化的 C++11 命令行推理程序。
 - 已关闭 Vulkan，默认单线程运行，符合 i.MX6ULL 单核 Cortex-A7 的硬件条件。
-- 已提供 NCNN 依赖、SqueezeNet 模型下载脚本及 PC/i.MX6ULL 构建入口。
+- 已下载并固定 NCNN `20230816`，SqueezeNet 模型文件已通过 SHA-256 校验。
+- 已在 Windows 10/11、Qt MinGW-w64 环境完成 PC 端构建和三张本地图片推理。
 - 已提供 ARMv7-A hard-float、NEON/VFPv4 工具链文件。
-- 已测试独立命令行参数模块；尚未取得 NCNN、模型和板卡实测结果。
+- 已通过命令行参数单元测试；尚未进行 i.MX6ULL 板端实测。
 
-因此当前可以表述为“建立了面向 i.MX6ULL 的 NCNN 本地图像推理工程”，在板端实际运行并
-记录结果前，不应写“已完成板端部署”或具体推理帧率。
+因此当前可以表述为“完成 NCNN 本地图像推理程序及 PC 端验证，并建立 i.MX6ULL 交叉编译
+配置”。在板端实际运行并记录结果前，不应写“已完成板端部署”或具体板端推理帧率。
 
 ## 数据流
 
@@ -187,4 +188,3 @@ cd /opt/edgevision
 
 用户代码采用 MIT License。NCNN、模型资产和参考教程的来源见
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-

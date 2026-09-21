@@ -4,7 +4,10 @@
 /models/*.param
 /models/*.param.bin
 /models/synset_words.txt
+/assets/*.jpg
+/assets/*.jpeg
+/assets/*.png
+/assets/*.bmp
 /results/
 *.log
 *.exe
-
