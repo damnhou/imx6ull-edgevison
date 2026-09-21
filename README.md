@@ -176,7 +176,7 @@ cd /opt/edgevision
 
 ## PC 与 i.MX6ULL 实测对比
 
-2026-09-21 使用同一份 SqueezeNet v1.1 模型、`cat.jpg`、相同预处理参数、单线程、
+使用同一份 SqueezeNet v1.1 模型、`cat.jpg`、相同预处理参数、单线程、
 预热 1 次并重复推理 10 次。PC 为 Intel Core i5-11400，板端为单核 Cortex-A7
 800 MHz、512 MB DDR 的 正点原子 ALPHA i.MX6ULL。
 
