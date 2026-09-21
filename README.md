@@ -174,6 +174,42 @@ cd /opt/edgevision
 
 详细检查项见 [板端适配](docs/BOARD_PORTING.md)和[测试计划](docs/TEST_PLAN.md)。
 
+## PC 与 i.MX6ULL 实测对比
+
+2026-09-21 使用同一份 SqueezeNet v1.1 模型、`cat.jpg`、相同预处理参数、单线程、
+预热 1 次并重复推理 10 次。PC 为 Intel Core i5-11400，板端为单核 Cortex-A7
+800 MHz、512 MB DDR 的 正点原子 ALPHA i.MX6ULL。
+
+| 指标 | PC（i5-11400） | i.MX6ULL | 对比 |
+|---|---:|---:|---:|
+| 图像预处理 | 0.547 ms | 12.793 ms | PC 约快 23.4 倍 |
+| 首次推理 | 12.977 ms | 653.161 ms | PC 约快 50.3 倍 |
+| 平均推理 | 10.957 ms | 649.259 ms | PC 约快 59.3 倍 |
+| 最快推理 | 8.726 ms | 644.264 ms | — |
+| 推理吞吐 | 约 91.3 次/秒 | 约 1.54 次/秒 | PC 约高 59.3 倍 |
+| 峰值 RSS | 40.8 MB | 36.6 MB | 板端少约 4.2 MB |
+| Top-1 | tabby cat，0.273 | tabby cat，0.273 | 完全一致 |
+
+PC 和板端的 Top-5 类别、顺序及置信度完全一致，说明模型文件、图像预处理、
+NCNN 推理和 ARM hard-float 移植链路正确。i.MX6ULL 单张推理约 0.65 秒，适合低频
+本地图片分类，不适合高帧率实时视频检测；约 36 MB 的峰值内存则能满足 512 MB
+板端环境。详细编译环境和三张测试图片的结果见
+[板端适配文档](docs/BOARD_PORTING.md)。
+
+复现实测：
+
+```bash
+./edgevision_cli \
+  --param models/squeezenet_v1.1.param \
+  --bin models/squeezenet_v1.1.bin \
+  --labels models/synset_words.txt \
+  --image assets/cat.jpg \
+  --width 227 --height 227 --pixel bgr \
+  --mean 104,117,123 --norm 1,1,1 \
+  --input data --output prob \
+  --topk 5 --warmup 1 --repeat 10 --threads 1
+```
+
 ## 后续范围
 
 第一版完成并记录板端数据后，再依次考虑：
