@@ -9,5 +9,5 @@ if [ -e "$destination" ]; then
     exit 1
 fi
 mkdir -p "$(dirname "$destination")"
-git clone --recursive --depth 1 --branch "$tag" https://github.com/Tencent/ncnn.git "$destination"
-
+# Vulkan and Python bindings are disabled, so NCNN submodules are unnecessary.
+git clone --depth 1 --branch "$tag" https://github.com/Tencent/ncnn.git "$destination"
